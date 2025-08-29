@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        form { margin-bottom: 20px; }
+        input { padding: 8px; margin: 5px; }
+        button { padding: 8px 12px; cursor: pointer; }
+        #message { margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>NOUVEL UTILISATEUR</h1>
+    
+    <form id="userForm">
+        <input type="text" id="username" placeholder="Nom d'Utilisateur" required>
+        <input type="password" id="password" placeholder="Mot de Passe" required>
+        <button type="submit">Confirmer</button>
+    </form>
+
+    <div id="message"></div>
+
+
+    <h2>All Users</h2>
+<button onclick="loadUsers()">Refresh Users</button>
+<table border="1" id="userTable">
+    <tr>
+        <th>ID</th>
+        <th>UserName</th>
+    </tr>
+</table>
+
+<script>
+    async function loadUsers() {
+        const response = await fetch("/users");
+        const users = await response.json();
+
+        const table = document.getElementById("userTable");
+        table.innerHTML = `
+            <tr>
+                <th>ID</th><th>UserName</th>
+            </tr>
+        `; // reset table with headers
+
+        users.forEach(user => {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${user.id}</td><td>${user.username}</td>`;
+            table.appendChild(row);
+        });
+    }
+
+    // auto-load on page load
+    loadUsers();
+</script>
+ 
+
+
+    <script>
+        document.getElementById("userForm").addEventListener("submit", async function(e) {
+            e.preventDefault(); // stop form from refreshing page
+
+            const formData = new FormData (e.target)
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch("/add_user", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+
+                const messageDiv = document.getElementById("message");
+                if (response.ok) {
+                    messageDiv.style.color = "green";
+                    messageDiv.innerText = result.message || "User added successfully!";
+                } else {
+                    messageDiv.style.color = "red";
+                    messageDiv.innerText = result.error || "Something went wrong!";
+                }
+            } catch (error) {
+                document.getElementById("message").innerText = "Error: " + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
