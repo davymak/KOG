@@ -3,19 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-        a { display: inline-block; margin: 10px; padding: 12px 20px; background: #007BFF; color: white; text-decoration: none; border-radius: 5px; }
-        a:hover { background: #0056b3; }
+        /* ---------- Full-page layout ---------- */
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* ---------- Blurred background ---------- */
+        .bg-blur {
+            background-image: url("/static/images/logo.png"); /* update with your logo path */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(8px);
+            z-index: -2;
+        }
+
+        /* Dark overlay for readability */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.3);
+            z-index: -1;
+        }
+
+        /* Sharp logo (watermark) */
+        .logo-center {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 200px;
+            width: 20%;
+            opacity: 0.85;
+            z-index: 1;
+        }
+
+        /* ---------- Content ---------- */
+        .content {
+            position: relative;
+            z-index: 2;
+            color: white;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 0.5em;
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-bottom: 1.5em;
+        }
+
+        a {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 20px;
+            background: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        a:hover {
+            background: #0056b3;
+        }
+
+        /* ---------- Responsive adjustments ---------- */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            p {
+                font-size: 1em;
+            }
+            .logo-center {
+                width: 30%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+            }
+            p {
+                font-size: 0.9em;
+            }
+            .logo-center {
+                width: 40%;
+            }
+            a {
+                padding: 10px 15px;
+            }
+        }
+
     </style>
 </head>
 <body>
 
-    <h1>Welcome to the App</h1>
-    <p>Please choose an action:</p>
+    <!-- Blurred background -->
+    <div class="bg-blur"></div>
+    <div class="overlay"></div>
 
-    <a href="{{ url_for('login') }}">Login</a>
-    <a href="{{ url_for('add_user') }}">Register</a>
+    <!-- Sharp logo -->
+    <img src="/static/images/logo.png" alt="Church Logo" class="logo-center">
+
+    <!-- Main content -->
+    <div class="content">
+        <h1>Welcome to the App</h1>
+        <p>Please choose an action:</p>
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('add_user') }}">Register</a>
+    </div>
 
 </body>
 </html>
