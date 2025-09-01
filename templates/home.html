@@ -59,8 +59,8 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 20%; /* adjust height if needed */
-            background-color: #720a90;
+            height: 5%; /* adjust height if needed */
+            background-color: #360544;
             z-index: -1;
         }
 
@@ -110,11 +110,44 @@
             background: #0056b3;
         }
 
+ /* ---------- Buttons ---------- */
+        .button-group {
+            display: flex;
+            gap: 20px; /* space between buttons */
+            justify-content: center;
+            opacity: 1;
+            animation: fadeOut 3s ease-in-out forwards; /* fade-out animation */
+            animation-delay: 4s; /* delay before starting fade-out */
+        }
+
+        .button-group a {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #720a90;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .button-group a:hover {
+            background:#720a90;
+        }
+
+
+           /* ---------- Fade-out animation ---------- */
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+
         /* ---------- Responsive ---------- */
         @media (max-width: 768px) {
             h1 { font-size: 2em; }
             p { font-size: 1em; }
             .logo-center { width: 30%; }
+            .button-group { flex-direction: column; gap: 10px; }
         }
 
         @media (max-width: 480px) {
@@ -122,6 +155,7 @@
             p { font-size: 0.9em; }
             .logo-center { width: 40%; }
             a { padding: 10px 15px; }
+            .button-group a { padding: 10px 15px; }
         }
 
     </style>
@@ -138,12 +172,9 @@
     <div class="bottom-surface"></div>
 
     <!-- Content -->
-    <div class="content fade-in">
-        <img src="/static/images/logo.png" alt="Church Logo" class="logo-center">
-        <h1>Welcome to the App</h1>
-        <p>Please choose an action:</p>
-        <a href="{{ url_for('login') }}">Login</a>
-        <a href="{{ url_for('add_user') }}">Register</a>
+    <div class="button-group">
+        <a href="{{ url_for('login') }}">Se connecter</a>
+        <a href="{{ url_for('add_user') }}">Créer un compte</a>
     </div>
 
 </body>
