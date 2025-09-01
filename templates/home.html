@@ -5,77 +5,84 @@
     <title>Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* ---------- Full-page layout ---------- */
-        body, html {
-            height: 100%;
+        /* ---------- Basic reset & layout ---------- */
+        * {
             margin: 0;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            padding: 20px;
+            padding: 0;
             box-sizing: border-box;
-            overflow: hidden;
-            background-color: #000; /* fallback */
         }
 
-        /* ---------- Blurred background ---------- */
-        .bg-blur {
-            background-image: url("/static/images/logo.png");
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+        html, body {
             height: 100%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            filter: blur(8px);
-            z-index: -2;
-        }
-
-        /* Dark overlay for readability */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.3);
-            z-index: -1;
+            font-family: Arial, sans-serif;
+            position: relative;
+            overflow-x: hidden;
         }
 
         /* ---------- Fade-in animation ---------- */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .fade-in {
-            animation: fadeIn 1.5s ease-out forwards;
+        /* ---------- Blurred background ---------- */
+        .bg-blur {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("/static/images/logo.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(10px);
+            animation: fadeIn 2s ease-in-out;
+            z-index: -3;
         }
 
-        /* ---------- Sharp logo (watermark) ---------- */
-        .logo-center {
-            position: absolute;
-            top: 5%;
-            left: 50%;
-            transform: translateX(-50%);
-            max-width: 200px;
-            width: 20%;
-            opacity: 0.85;
-            z-index: 1;
+        /* ---------- Grey dotted overlay ---------- */
+        .dotted-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(128,128,128,0.3) 1px, transparent 1px);
+            background-size: 10px 10px;
+            z-index: -2;
+        }
+
+        /* ---------- Purple bottom surface ---------- */
+        .bottom-surface {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20%; /* adjust height if needed */
+            background-color: #720a90;
+            z-index: -1;
         }
 
         /* ---------- Content ---------- */
         .content {
             position: relative;
-            z-index: 2;
+            z-index: 1;
+            height: 80%; /* leave space for bottom surface */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
             color: white;
-            max-width: 500px;
-            width: 100%;
+        }
+
+        .logo-center {
+            max-width: 200px;
+            width: 20%;
+            opacity: 0.85;
+            margin-bottom: 20px;
         }
 
         h1 {
@@ -103,7 +110,7 @@
             background: #0056b3;
         }
 
-        /* ---------- Responsive adjustments ---------- */
+        /* ---------- Responsive ---------- */
         @media (max-width: 768px) {
             h1 { font-size: 2em; }
             p { font-size: 1em; }
@@ -121,15 +128,18 @@
 </head>
 <body>
 
-    <!-- Blurred background -->
+    <!-- Blurred background logo -->
     <div class="bg-blur"></div>
-    <div class="overlay"></div>
 
-    <!-- Sharp logo -->
-    <img src="/static/images/logo.png" alt="Church Logo" class="logo-center fade-in">
+    <!-- Grey dotted overlay -->
+    <div class="dotted-overlay"></div>
 
-    <!-- Main content -->
-    <div class="content fade-in" style="animation-delay: 0.5s;">
+    <!-- Purple bottom surface -->
+    <div class="bottom-surface"></div>
+
+    <!-- Content -->
+    <div class="content fade-in">
+        <img src="/static/images/logo.png" alt="Church Logo" class="logo-center">
         <h1>Welcome to the App</h1>
         <p>Please choose an action:</p>
         <a href="{{ url_for('login') }}">Login</a>
