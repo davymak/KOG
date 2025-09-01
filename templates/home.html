@@ -17,11 +17,13 @@
             position: relative;
             padding: 20px;
             box-sizing: border-box;
+            overflow: hidden;
+            background-color: #000; /* fallback */
         }
 
         /* ---------- Blurred background ---------- */
         .bg-blur {
-            background-image: url("/static/images/logo.png"); /* update with your logo path */
+            background-image: url("/static/images/logo.png");
             position: fixed;
             top: 0;
             left: 0;
@@ -45,7 +47,17 @@
             z-index: -1;
         }
 
-        /* Sharp logo (watermark) */
+        /* ---------- Fade-in animation ---------- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 1.5s ease-out forwards;
+        }
+
+        /* ---------- Sharp logo (watermark) ---------- */
         .logo-center {
             position: absolute;
             top: 5%;
@@ -93,30 +105,16 @@
 
         /* ---------- Responsive adjustments ---------- */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
-            }
-            p {
-                font-size: 1em;
-            }
-            .logo-center {
-                width: 30%;
-            }
+            h1 { font-size: 2em; }
+            p { font-size: 1em; }
+            .logo-center { width: 30%; }
         }
 
         @media (max-width: 480px) {
-            h1 {
-                font-size: 1.5em;
-            }
-            p {
-                font-size: 0.9em;
-            }
-            .logo-center {
-                width: 40%;
-            }
-            a {
-                padding: 10px 15px;
-            }
+            h1 { font-size: 1.5em; }
+            p { font-size: 0.9em; }
+            .logo-center { width: 40%; }
+            a { padding: 10px 15px; }
         }
 
     </style>
@@ -128,10 +126,10 @@
     <div class="overlay"></div>
 
     <!-- Sharp logo -->
-    <img src="/static/images/logo.png" alt="Church Logo" class="logo-center">
+    <img src="/static/images/logo.png" alt="Church Logo" class="logo-center fade-in">
 
     <!-- Main content -->
-    <div class="content">
+    <div class="content fade-in" style="animation-delay: 0.5s;">
         <h1>Welcome to the App</h1>
         <p>Please choose an action:</p>
         <a href="{{ url_for('login') }}">Login</a>
