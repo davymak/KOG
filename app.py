@@ -100,6 +100,7 @@ def login():
                 #Verify Password       
         if user and user.check_password(password):
             login_user(user)
+            flash("Connexion Réussie")
             return redirect(url_for("dashboard"))  # 👈 redirect to dashboard
         else:
             flash('Invalid Username or Password')
@@ -148,6 +149,7 @@ def add_user():
 
         # Auto login the new user
         login_user(new_user)
+        flash("Connexion Réussie")
         return jsonify({"redirect": url_for("dashboard")})    
     except Exception as e:
         db.session.rollback()

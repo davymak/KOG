@@ -1,36 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        form { max-width: 400px; margin: auto; }
-        input { width: 100%; padding: 8px; margin: 8px 0; }
-        button { padding: 10px 20px; }
-        .message { margin-top: 10px; font-weight: bold; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    html, body {
+        height: 100%;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Grey dotted overlay */
+    .dotted-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-image: radial-gradient(rgba(128,128,128,0.3) 1px, transparent 1px);
+        background-size: 10px 10px;
+        z-index: 1;
+    }
+
+    /* Purple bottom surface */
+    /*.bottom-surface {
+        position: fixed;
+        bottom: 0; left: 0;
+        width: 100%; height: 15%;
+        background-color: #360544;
+        z-index: 2;
+    }*/
+
+    /* Centered form container */
+    .page-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        z-index: 3; /* above overlay and bottom */
+    }
+
+    .form-container {
+        width: 90%;
+        max-width: 400px;
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        text-align: center;
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 { margin-bottom: 20px; color: #333; }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        width: 40%;
+        padding: 12px;
+        background-color: #720a90;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover { background-color: #5c0872; }
+
+    .message {
+        margin-top: 10px;
+        font-weight: bold;
+        text-align: center;
+        color: red;
+    }
+
+    /* Responsive */
+    @media (max-width:768px) {
+        .form-container { padding: 25px; }
+        input, button { font-size: 14px; }
+    }
+
+    @media (max-width:480px) {
+        .form-container { padding: 20px; }
+        input, button { font-size: 13px; }
+    }
+
+/* Toast message */
+.toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: green;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    font-weight: bold;
+    font-size: 16px;
+    opacity: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeInOut 3s forwards;
+}
+
+/* Fade-in and fade-out animation */
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+}
+</style>
 </head>
 <body>
 
-<h2>Login</h2>
+<div class="dotted-overlay"></div>
+<div class="bottom-surface"></div>
 
-<form id="loginForm" method="POST" action="{{ url_for('login') }}">
-    <input type="text" name="username" placeholder="Username" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-</form>
+<div class="page-container">
+    <div class="form-container">
+        <h2>Se Connecter</h2>
+        <form id="loginForm" method="POST" action="{{ url_for('login') }}">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Se Connecter</button>
+        </form>
 
-<div class="message" id="message">
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-                <p style="color:red;">{{ msg }}</p>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+        
+    </div>
 </div>
+
+
+
+
 
 </body>
 </html>
