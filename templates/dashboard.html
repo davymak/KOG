@@ -1,95 +1,304 @@
-<!-- templates/dashboard.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            padding: 20px; 
-            margin: 0;
-            background-color: #f5f5f5;
+        /* --------- General --------- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+
+        h2 { margin-bottom: 10px; color: #333; }
+
+        .container { width: 95%; max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        /* --------- Header --------- */
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            background: #720a90;
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
 
-        h1 { color: #333; }
-
-        .dashboard { 
-            margin-top: 20px; 
-            padding: 20px; 
-            border: 1px solid #ccc; 
-            border-radius: 10px;
+        /* --------- Sections --------- */
+        .section {
             background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        a { 
-            display: inline-block; 
-            margin-top: 20px; 
-            text-decoration: none; 
-            color: white; 
-            background-color: #720a90; 
-            padding: 10px 20px; 
-            border-radius: 8px;
-        }
-
-        a:hover { background-color: #5c0872; }
-
-        /* ---------- Toast message ---------- */
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            color: green;
-            padding: 15px 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            font-weight: bold;
-            font-size: 16px;
-            opacity: 0;
-            z-index: 9999;
+        .section-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
-            animation: fadeInOut 3s forwards;
+            margin-bottom: 15px;
         }
 
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            10% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            90% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        .section-header button {
+            background: #720a90;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
         }
+
+        .section-header button:hover { background: #5c0872; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+
+        th { background: #f0f0f0; }
+
+        /* --------- Footer / Bottom Surface --------- */
+        .bottom-surface {
+            height: 20px;
+            background: #360544;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+            font-weight: bold;
+            border-radius: 0;
+        }
+
+        /* --------- Responsive --------- */
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            th, td { font-size: 14px; }
+        }
+
     </style>
 </head>
 <body>
 
-<!-- Toast container -->
-<div id="toast" class="toast"></div>
-
-<h1>{{ welcome_message }}</h1>
-
-<div class="dashboard">
-    <p>Ceci est votre tableau de bord personnel.</p>
-    <!-- Add more dashboard widgets here -->
+<!-- Top surface with welcome message -->
+<div class="top-surface">
+    <h1 class="typing">Bienvenue {{ role_full }}</h1>
+    <!-- Disconnect Button -->
+    <button id="logout-btn" href="{{ url_for('logout')}}" style="
+        position: absolute;
+        top: 2px;
+        right: 10px;
+        padding: 6px 12px;
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;"    
+    >Se déconnecter</button>
 </div>
 
-<a href="{{ url_for('logout') }}">Se déconnecter</a>
+<!--Not working yet disconnect button-->
+<script> 
+    document.getElementById("logout-btn").addEventListener("click", function() {
+        alert("Déconnexion effectuée !");
+        // Ici, ajoutez votre logique réelle de déconnexion
+    });
+</script>
 
-<!-- JS to show toast if flash message exists -->
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <script>
-            window.onload = () => {
-                const toast = document.getElementById("toast");
-                toast.innerHTML = "&#10004; {{ messages[0] }}"; // green checkmark + message
-                toast.style.display = "flex";
-            };
-        </script>
-    {% endif %}
-{% endwith %}
+<style>
+    .top-surface {
+        background: #720a90;
+        color: white;
+        text-align: center;
+        padding: 7px 0;
+        font-size: 8px;
+        font-weight: bold;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+
+    body {
+        margin: 0;
+        padding-top: 80px; /* prevent content hiding behind header */
+        font-family: Arial, sans-serif;
+    }
+
+    /* Typing animation */
+    .typing {
+        overflow: hidden;
+        white-space: pre;
+        border-right: 3px solid white; 
+        width: 0;
+        margin: auto;
+        animation: typing 6s steps(40, end) forwards;
+    }
+
+    /*@keyframes typing {
+        from { width: 0 }
+        to { width: 100% }
+    }
+
+    @keyframes blink {
+        from, to { border-color: transparent }
+        50% { border-color: white; }
+    }*/
+
+    /* stop the blinking cursor after typing is done */
+.typing.finished {
+    border-right: none;
+}
+</style>
+
+<!-- Dashboard Card Grid -->
+<div class="card-grid">
+
+    <!-- Card 1: Full Members List -->
+    <div class="card-box">
+        <a href="{{ url_for('full_members_list') }}" class="card-link">
+            <h2>Liste complète Membres de l'Église</h2>
+            <i class="fa-solid fa-users card-icon"></i>
+        </a>
+    </div>
+
+    <!-- Card 2: Monthly Checking List -->
+    <div class="card-box">
+        <a href="{{ url_for('monthly_presence') }}" class="card-link">
+            <h2>Liste de présence par mois</h2>
+            <i class="fa-solid fa-calendar-days card-icon"></i>
+        </a>
+    </div>
+
+    <!-- Card 3: Sunday Checking List -->
+    <div class="card-box">
+        <a href="/sunday-presence" class="card-link">
+            <h2>Liste de présence du dimanche</h2>
+            <i class="fa-solid fa-church card-icon"></i>
+        </a>
+    </div>
+
+    <!-- Card 4: Presence Summary -->
+    <div class="card-box">
+        <a href="/presence-summary" class="card-link">
+            <h2>Résumé des présences et absences</h2>
+            <i class="fa-solid fa-chart-pie card-icon"></i>
+        </a>
+    </div>
+
+    <!-- Card 5: Quick Sunday Actions -->
+    <div class="card-box">
+        <a href="/quick-actions" class="card-link">
+            <h2>Actions rapides après le service</h2>
+            <i class="fa-solid fa-bolt card-icon"></i>
+        </a>
+    </div>
+
+</div>
+
+<style>
+    /* Grid container */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 20px auto;
+        max-width: 1200px;
+        padding: 0 20px;
+    }
+
+    /* Card box styling */
+    .card-box {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+        padding: 20px;
+        cursor: pointer;
+        transition: transform 0.3s, box-shadow 0.3s;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Hover effect */
+    .card-box:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.25);
+    }
+
+    /* Link styles */
+    .card-link {
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        height: 150px;
+    }
+
+    .card-link h2 {
+        margin: 0;
+        color: #720a90;
+        font-size: 18px;
+        text-align: center;
+    }
+
+    .card-icon {
+        font-size: 18px;
+        color: #c0a000; /* gold accent */
+    }
+
+    @media (max-width: 768px) {
+        .card-link h2 { font-size: 16px; }
+        .card-icon { font-size: 10px; }
+    }
+</style>
+
+
+
+<div class="bottom-surface">
+    
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const typingEl = document.querySelector(".typing");
+    const text = typingEl.textContent; // get the full text dynamically
+    const charCount = text.length;
+
+    // apply typing animation dynamically
+    typingEl.style.animation = `typing ${charCount * 0.2}s steps(${charCount}, end) forwards`;
+
+    typingEl.addEventListener("animationend", () => {
+        typingEl.classList.add("finished"); // remove cursor
+    });
+
+    // create keyframes dynamically
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @keyframes typing {
+            from { width: 0ch; }
+            to { width: ${charCount}ch; }
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
+
 
 </body>
 </html>

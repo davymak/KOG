@@ -27,3 +27,11 @@ class User(db.Model, UserMixin):
     def to_dict(self):
         return {"id":self.id, "username":self.username}
     
+class Member(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    phone = db.Column(db.Integer())
+    place = db.Column(db.String(100))
+    department = db.Column(db.String(100))
+    marital_status = db.Column(db.String(50))
