@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liste complète des membres</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    /* --- General Body --- */
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #5a0e8c;
+      font-weight: 700;
+      font-size: 28px;
+      margin-bottom: 25px;
+    }
+
+    /* --- Add Member Button --- */
+    .btn-add {
+      background: #5a0e8c;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+    }
+    .btn-add:hover {
+      background: #450a6a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
+
+    /* --- Table --- */
+    .table-responsive {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    th, td {
+      padding: 14px 18px;
+      text-align: left;
+      font-size: 15px;
+    }
+    th {
+      background: #f0f0f0;
+      font-weight: 600;
+      color: #555;
+    }
+    tbody tr:hover {
+      background: #f8f4ff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+    }
+    td i.fa-user {
+      font-size: 24px;
+      color: #aaa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* --- Action Buttons --- */
+    .btn {
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    .btn-primary {
+      background: #5a0e8c;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #450a6a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .btn-danger {
+      background: #e53935;
+      color: #fff;
+    }
+    .btn-danger:hover {
+      background: #b71c1c;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* --- Modal --- */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-content {
+      width: 90%;
+      max-width: 500px;
+      padding: 20px 25px;
+      border-radius: 15px;
+      text-align: center;
+      background: #fff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      animation: slideIn 0.3s ease;
+      position: relative;
+    }
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #555;
+    }
+    .close:hover { color: #5a0e8c; }
+
+    /* --- Avatar --- */
+    .avatar-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+    .avatar-placeholder {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #bbb;
+      margin-bottom: 0;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+    }
+    .avatar-upload:hover .avatar-placeholder {
+      background: #eae6f5;
+      transform: scale(1);
+    }
+    .avatar-upload p { font-size: 13px; color: #666; }
+
+    /* --- Form Grid Layout --- */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .form-grid input,
+    .form-grid select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+    .form-grid input:focus,
+    .form-grid select:focus {
+      border-color: #5a0e8c;
+      outline: none;
+      box-shadow: 0 0 8px rgba(90,14,140,0.2);
+    }
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    /* --- Submit Button --- */
+    .btn-submit {
+      background: #5a0e8c;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+    }
+    .btn-submit:hover {
+      background: #450a6a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Keep action buttons side by side inside the table */
+td .btn {
+  display: inline-block;   /* side by side */
+  margin-right: 6px;       /* little spacing */
+  vertical-align: middle;  /* align nicely */
+}
+
+/* Keep action buttons side by side inside the table */
+td .btn {
+  display: inline-block;   /* put buttons in one line */
+  margin-right: 6px;       /* spacing between them */
+  vertical-align: middle;  /* align nicely */
+}
+
+
+    /* --- Animations --- */
+    @keyframes fadeIn { from {opacity:0;} to{opacity:1;} }
+    @keyframes slideIn { from {transform:translateY(-20px);} to {transform:translateY(0);} }
+
+/* --- Modern Dropdown Styling --- */
+select {
+  appearance: none; /* remove default arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  border: 2px solid #5a0e8c;
+  border-radius: 12px;
+  background: #fff url("data:image/svg+xml;utf8,<svg fill='%235a0e8c' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 12px center;
+  background-size: 18px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+}
+
+select:hover {
+  border-color: #450a6a;
+  box-shadow: 0 4px 10px rgba(90,14,140,0.2);
+}
+
+select:focus {
+  outline: none;
+  border-color: #d4af37; /* gold accent */
+  box-shadow: 0 0 8px rgba(212,175,55,0.4);
+}
+
+
+/* --- Dropdowns Container --- */
+.dropdowns-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+/* Adapt dropdown size for smaller screens */
+@media (max-width: 600px) {
+  .dropdowns-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+/* --- Presence Toggle --- */
+.presence-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  background: #f4f4f8;
+  border-radius: 25px;
+  padding: 5px 15px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.presence-toggle .option {
+  padding: 5px 12px;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.presence-toggle .present {
+  color: #4caf50;
+}
+.presence-toggle .absent {
+  color: #e53935;
+}
+
+.presence-toggle .active {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* --- Save Presence Button --- */
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #4caf50, #81c784);
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+.btn-save:hover {
+  background: linear-gradient(135deg, #388e3c, #66bb6a);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+.btn-save:active {
+  transform: scale(0.98);
+}
+
+.btn-save::after {
+  content: " →";
+  opacity: 0;
+  transform: translateX(-5px);
+  transition: all 0.3s ease;
+}
+
+.btn-save:hover::after {
+  opacity: 1;
+  transform: translateX(5px);
+}
+
+
+ </style>
+</head>
+<body>
+  <div class="container">
+
+<!-- Button + Search Row -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+  <!-- Add Member Button -->
+  <button id="openModal" class="btn-add">
+    <i class="fa-solid fa-user-plus"></i> Ajouter un membre
+  </button>
+
+<div id="memberCount" style="text-align: right; margin-bottom: 10px; font-weight: 600; color: #5a0e8c;">
+  0 membres
+</div>
+
+
+  <!-- Search Tools -->
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <!-- Column Selector -->
+    <select id="searchCategory" style="padding: 10px 15px; border-radius: 12px; border: 1px solid #ccc; font-size: 14px;">
+      <option value="all">🔎 Tous les champs</option>
+      <option value="1">Prénom</option>
+      <option value="2">Nom</option>
+      <option value="3">Téléphone</option>
+      <option value="4">Département</option>
+      <option value="5">Statut marital</option>
+      <option value="6">Adresse</option>
+    </select>
+
+    <!-- Search Input -->
+    <input type="text" id="searchInput" placeholder="Rechercher..." 
+           style="padding: 10px 15px; border-radius: 12px; border: 1px solid #ccc; font-size: 14px; width: 250px;">
+  </div>
+</div>
+
+<!-- Month and Sunday Selection -->
+<div class="dropdowns-container">
+  <select id="month">
+    <option value="">-- Choisir un mois --</option>
+    {% for year, month, month_name in months %}
+      <option value="{{ year }}-{{ month }}"
+        {% if year == current_year and month == current_month %}selected{% endif %}>
+        {{ month_name }} {{ year }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <select id="sunday">
+    <option value="">-- Choisir un dimanche --</option>
+  </select>
+</div>
+
+
+
+    <!-- Members Table -->
+    <div class="table-responsive" id="presenceForm">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>PRENOMS</th>
+            <th>NOM</th>
+            <th>N° TELEPHONE</th>
+            <th>DEPARTEMENT</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="membersTable">
+          {% for m in members %}
+          <tr data-member-id="{{ m.id }}">
+            <td><i class="fa-solid fa-user"></i></td>
+            <td>{{ m.first_name }}</td>
+            <td>{{ m.last_name }}</td>
+            <td>{{ m.phone }}</td>
+            <td>{{ m.department }}</td>
+            <td>
+              <div class="presence-toggle" data-id="{{ m.id }}">
+                  <span class="option present">✔</span>
+                  <span class="option absent">✘</span>
+                </div>
+            </td>
+            <td>
+              <button class="btn btn-primary edit-btn"
+                      data-id="{{ m.id }}"
+                      data-first="{{ m.first_name }}"
+                      data-last="{{ m.last_name }}"
+                      data-phone="{{ m.phone }}"
+                      data-department="{{ m.department }}">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="btn btn-danger delete-btn" data-id="{{ m.id }}">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <button type="submit" class="btn btn-save">Enregistrer</button>
+    </div>
+  </div>
+
+  <!-- Modal Form -->
+  <div id="memberModal" class="modal" style="display: none";>
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3 id="modalTitle">Ajouter un nouveau membre</h3>
+      <form id="addMemberForm">
+        <input type="hidden" id="memberId">
+        <!-- Avatar Upload -->
+        <label class="avatar-upload">
+          <input type="file" accept="image/*">
+          <div class="avatar-placeholder"><i class="fa-solid fa-user"></i></div>
+          <p>Ajouter une photo</p>
+        </label>
+
+        <!-- Form Grid -->
+        <div class="form-grid">
+          <input id="firstName" type="text" placeholder="Prénom" required>
+          <input id="lastName" type="text" placeholder="Nom" required>
+          <input id="department" type="text" placeholder="Département">
+          <input id="phone" type="tel" placeholder="Téléphone" required>
+          <input id="maritalStatus" type="text" placeholder="Célibataire, Marié ....">
+          <input id="place" type="text" placeholder="Lieu de résidence">
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn-submit">Ajouter</button>
+      </form>
+    </div>
+  </div>
+<!-- Delete Confirmation Modal -->
+<!-- ✅ Correct -->
+<div id="deleteModal" class="modal" style="display:none">
+  <div class="modal-content">
+    <span class="close" id="deleteClose">&times;</span>
+    <h3>Confirmer la suppression</h3>
+    <p>Voulez-vous vraiment supprimer ce membre ?</p>
+    <div style="margin-top: 20px; display: flex; justify-content: center; gap: 15px;">
+      <button id="confirmDelete" class="btn btn-danger">Supprimer</button>
+      <button id="cancelDelete" class="btn btn-primary">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- Modal Handling ---
+  const modal = document.getElementById("memberModal");
+  const openBtn = document.getElementById("openModal");
+  const closeBtn = document.querySelector(".close");
+  const modalTitle = document.getElementById("modalTitle");
+  const submitBtn = document.getElementById("submitBtn");
+
+  openBtn.onclick = () => {
+    modal.style.display = "flex";
+    modalTitle.textContent = "Ajouter un nouveau membre";
+    submitBtn.textContent = "Ajouter";
+    document.getElementById("addMemberForm").reset();
+    document.getElementById("memberId").value = "";
+  };
+
+  closeBtn.onclick = () => modal.style.display = "none";
+  window.onclick = e => { if(e.target == modal) modal.style.display = "none"; }
+
+  // --- Edit Buttons ---
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.getElementById("memberId").value = btn.dataset.id;
+      document.getElementById("firstName").value = btn.dataset.first;
+      document.getElementById("lastName").value = btn.dataset.last;
+      document.getElementById("phone").value = btn.dataset.phone;
+      document.getElementById("place").value = btn.dataset.place;
+      document.getElementById("department").value = btn.dataset.department;
+      document.getElementById("maritalStatus").value = btn.dataset.status;
+
+      modalTitle.textContent = "Modifier le membre";
+      submitBtn.textContent = "Enregistrer";
+      modal.style.display = "flex";
+    });
+  });
+
+  // --- Delete Confirmation Modal ---
+const deleteModal = document.getElementById("deleteModal");
+const confirmDeleteBtn = document.getElementById("confirmDelete");
+const cancelDeleteBtn = document.getElementById("cancelDelete");
+
+let memberToDeleteId = null;
+
+// Attach to every delete button
+document.querySelectorAll(".delete-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    memberToDeleteId = btn.dataset.id; // save the member id
+    deleteModal.style.display = "flex"; // open modal
+  });
+});
+
+// Close delete modal when clicking the X
+document.getElementById("deleteClose").onclick = () => {
+  deleteModal.style.display = "none";
+  memberToDeleteId = null;
+};
+
+// Close delete modal when clicking outside
+window.addEventListener("click", e => {
+  if (e.target === deleteModal) {
+    deleteModal.style.display = "none";
+    memberToDeleteId = null;
+  }
+});
+
+// Cancel closes modal
+cancelDeleteBtn.onclick = () => {
+  deleteModal.style.display = "none";
+  memberToDeleteId = null;
+};
+
+// Confirm deletion
+confirmDeleteBtn.onclick = async () => {
+  if (!memberToDeleteId) return;
+
+  try {
+    const res = await fetch("/delete-member/" + memberToDeleteId, {
+      method: "POST"
+    });
+    const result = await res.json();
+    if (result.success) {
+      deleteModal.style.display = "none";
+      location.reload(); // refresh to see changes
+    } else {
+      alert(result.error || "Erreur lors de la suppression");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Erreur serveur, réessayez !");
+  }
+};
+
+  // --- Form Submit: Add or Edit ---
+  document.getElementById("addMemberForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const id = document.getElementById("memberId").value;
+    const member = {
+      first_name: document.getElementById("firstName").value,
+      last_name: document.getElementById("lastName").value,
+      phone: document.getElementById("phone").value,
+      place: document.getElementById("place").value,
+      department: document.getElementById("department").value,
+      marital_status: document.getElementById("maritalStatus").value
+    };
+
+    let url = "/add-member";
+if (id) {
+    url = "/update-member/" + id;   // must match route
+}
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(member)
+      });
+
+      const result = await response.json();
+
+      if(result.success) {
+        modal.style.display = "none";
+        document.getElementById("addMemberForm").reset();
+        document.getElementById("memberId").value = "";
+        submitBtn.textContent = "Ajouter";
+        location.reload();
+      } else {
+        alert(result.error || "Erreur lors de l'enregistrement");
+      }
+    } catch(err) {
+      console.error(err);
+      alert("Erreur serveur, réessayez !");
+    }
+  });
+
+  // --- Search Filter with Category ---
+document.getElementById("searchInput").addEventListener("keyup", function() {
+  const filter = this.value.toLowerCase();
+  const category = document.getElementById("searchCategory").value;
+  const rows = document.querySelectorAll("#membersTable tr");
+
+  rows.forEach(row => {
+    let match = false;
+
+    if (category === "all") {
+      // Search in all cells
+      row.querySelectorAll("td").forEach(cell => {
+        if (cell.textContent.toLowerCase().includes(filter)) {
+          match = true;
+        }
+      });
+    } else {
+      // Search only in selected column
+      const cell = row.cells[parseInt(category)];
+      if (cell && cell.textContent.toLowerCase().includes(filter)) {
+        match = true;
+      }
+    }
+
+    row.style.display = match ? "" : "none";
+  });
+});
+
+function updateMemberCount() {
+  const rows = document.querySelectorAll("#membersTable tr");
+  let count = 0;
+  rows.forEach(row => {
+    if (row.style.display !== "none") count++;
+  });
+  document.getElementById("memberCount").textContent = `${count} membres`;
+}
+
+// Initial count
+updateMemberCount();
+
+// Update count on search input
+document.getElementById("searchInput").addEventListener("keyup", updateMemberCount);
+
+// Update count when category changes
+document.getElementById("searchCategory").addEventListener("change", updateMemberCount);
+
+document.addEventListener("DOMContentLoaded", function() {
+  const monthDropdown = document.getElementById("month");
+  const sundayDropdown = document.getElementById("sunday");
+  const presenceForm = document.getElementById("presenceForm"); // wrapper div
+  const saveBtn = document.querySelector(".btn-save");
+
+  // Initialise toggles: default = absent
+  function initToggles() {
+    document.querySelectorAll(".presence-toggle").forEach(toggle => {
+      const options = toggle.querySelectorAll(".option");
+      // ensure dataset.id exists (it does from template)
+      const id = toggle.dataset.id || toggle.closest("tr")?.dataset.memberId;
+      if (!toggle.dataset.id && id) toggle.dataset.id = id;
+
+      options.forEach(o => o.classList.remove("active"));
+      const absent = toggle.querySelector(".absent");
+      if (absent) absent.classList.add("active");
+      toggle.dataset.value = "false";
+
+      // click handlers
+      options.forEach(opt => {
+        opt.onclick = () => {
+          options.forEach(o => o.classList.remove("active"));
+          opt.classList.add("active");
+          toggle.dataset.value = opt.classList.contains("present") ? "true" : "false";
+        };
+      });
+    });
+  }
+
+  initToggles();
+
+  // Populate Sundays when month changes
+  monthDropdown.addEventListener("change", () => {
+    const [year, month] = (monthDropdown.value || "").split("-");
+    sundayDropdown.innerHTML = "<option value=''>-- Choisir un dimanche --</option>";
+    presenceForm.style.display = "none";
+
+    if (year && month) {
+      const y = parseInt(year), m = parseInt(month);
+      const daysInMonth = new Date(y, m, 0).getDate();
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(y, m - 1, d);
+        if (dateObj.getDay() === 0) {
+          const option = document.createElement("option");
+          option.value = dateObj.toISOString().split("T")[0];
+          option.textContent = dateObj.toLocaleDateString("fr-FR", { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+          sundayDropdown.appendChild(option);
+        }
+      }
+    }
+  });
+
+  // When a sunday is selected: show table and load existing presences
+  sundayDropdown.addEventListener("change", async () => {
+    const val = sundayDropdown.value;
+    presenceForm.style.display = val ? "block" : "none";
+
+    // load saved presence for that sunday and update toggles
+    if (val) {
+      try {
+        const res = await fetch("/get-presence?sunday=" + encodeURIComponent(val));
+        if (res.ok) {
+          const map = await res.json(); // { "member_id": true/false, ... }
+          document.querySelectorAll(".presence-toggle").forEach(toggle => {
+            const id = toggle.dataset.id;
+            const options = toggle.querySelectorAll(".option");
+            options.forEach(o => o.classList.remove("active"));
+            if (map.hasOwnProperty(id) && map[id] === true) {
+              toggle.querySelector(".present")?.classList.add("active");
+              toggle.dataset.value = "true";
+            } else {
+              toggle.querySelector(".absent")?.classList.add("active");
+              toggle.dataset.value = "false";
+            }
+          });
+        } else {
+          console.error("get-presence failed:", res.status, await res.text());
+        }
+      } catch (err) {
+        console.error("get-presence error:", err);
+      }
+    }
+  });
+
+  // Save presence
+  saveBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const sundayDate = sundayDropdown.value;
+    if (!sundayDate) return alert("Veuillez sélectionner un dimanche.");
+
+    const members = {};
+    document.querySelectorAll(".presence-toggle").forEach(toggle => {
+      const id = toggle.dataset.id;
+      if (id) members[id] = toggle.dataset.value === "true";
+    });
+
+    saveBtn.disabled = true;
+    const origText = saveBtn.textContent;
+    saveBtn.textContent = "Enregistrement...";
+
+    try {
+      const res = await fetch("/save-presence", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sunday: sundayDate, members })
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        alert("Erreur serveur " + res.status + " — voir console pour détails.");
+        console.error("save-presence failed:", res.status, txt);
+      } else {
+        const data = await res.json();
+        if (data.success) {
+          saveBtn.textContent = "Enregistré ✓";
+          setTimeout(()=> saveBtn.textContent = origText, 1400);
+          alert("Présence enregistrée ✅");
+        } else {
+          alert("Erreur: " + (data.error || "inconnue"));
+        }
+      }
+    } catch (err) {
+      console.error("save-presence error:", err);
+      alert("Erreur réseau / serveur — regarde la console et le terminal Flask.");
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  // Trigger initial month -> populate Sundays and auto-select current month on load
+  if (monthDropdown.value) monthDropdown.dispatchEvent(new Event("change"));
+});
+
+
+</script>
+</body>
+</html>

@@ -65,7 +65,7 @@
         th { background: #f0f0f0; }
 
         /* --------- Footer / Bottom Surface --------- */
-        .bottom-surface {
+        /*.bottom-surface {
             height: 20px;
             background: #360544;
             text-align: center;
@@ -73,7 +73,7 @@
             line-height: 20px;
             font-weight: bold;
             border-radius: 0;
-        }
+        }*/
 
         /* --------- Responsive --------- */
         @media (max-width: 768px) {
@@ -93,7 +93,7 @@
 <div class="top-surface">
     <h1 class="typing">Bienvenue {{ role_full }}</h1>
     <!-- Disconnect Button -->
-    <button id="logout-btn" href="{{ url_for('logout')}}" style="
+    <button id="logout-btn" style="
         position: absolute;
         top: 2px;
         right: 10px;
@@ -110,7 +110,7 @@
 <!--Not working yet disconnect button-->
 <script> 
     document.getElementById("logout-btn").addEventListener("click", function() {
-        alert("Déconnexion effectuée !");
+        window.location.href = "{{ url_for('logout') }}"; // redirect to logout route
         // Ici, ajoutez votre logique réelle de déconnexion
     });
 </script>
@@ -191,7 +191,7 @@
 
     <!-- Card 4: Presence Summary -->
     <div class="card-box">
-        <a href="/presence-summary" class="card-link">
+        <a href="{{ url_for('reports') }}" class="card-link">
             <h2>Résumé des présences et absences</h2>
             <i class="fa-solid fa-chart-pie card-icon"></i>
         </a>
@@ -199,11 +199,29 @@
 
     <!-- Card 5: Quick Sunday Actions -->
     <div class="card-box">
-        <a href="/quick-actions" class="card-link">
+        <a href="{{ url_for('sunday_presence') }}" class="card-link">
             <h2>Actions rapides après le service</h2>
             <i class="fa-solid fa-bolt card-icon"></i>
         </a>
     </div>
+
+    <!-- Card 6: Active Members -->
+    <div class="card-box">
+        <a href="{{ url_for('active_members') }}" class="card-link">
+            <h2>Membres Actifs</h2>
+            <i class="fa-solid fa-bolt card-icon"></i>
+        </a>
+    </div>
+
+    <!-- Card 7: Sleeping Members -->
+    <div class="card-box">
+        <a href="{{ url_for('sleeping_members') }}" class="card-link">
+            <h2>Membres Dormants</h2>
+            <i class="fa-solid fa-bolt card-icon"></i>
+        </a>
+    </div>
+
+
 
 </div>
 
