@@ -86,3 +86,9 @@ class SundayPresence(db.Model):
         return f"<SundayPresence member={self.member_id} date={self.sunday_date} present={self.present}>"
 
 
+
+class Presence(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    member_id = db.Column(db.Integer, db.ForeignKey("member.id"))
+    sunday = db.Column(db.Date)
+    present = db.Column(db.Boolean)

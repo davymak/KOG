@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Statistiques</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+/* ---------- Blurred background ---------- */
+        .bg-blur {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("/static/images/logo.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(10px);
+            animation: fadeIn 2s ease-in-out;
+            z-index: -3;
+        }
+</style>
+</head>
+<body class="bg-gray-100 font-sans p-6 text-gray-800">
+
+<h1 class="text-3xl font-bold text-center text-purple-700 mb-10">STATISTIQUES</h1>
+   <!-- Blurred background logo -->
+    <div class="bg-blur"></div>
+
+<div class="flex justify-center mb-8">
+  <select id="month" class="px-4 py-2 rounded-xl border-2 border-purple-600 text-gray-700 focus:outline-none">
+    <option value="">-- Choisir un mois --</option>
+    {% for year, month, month_name in months %}
+      <option value="{{ year }}-{{ month }}">{{ month_name }} {{ year }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<div id="dashboardReports" class="max-w-4xl mx-auto">
+
+  <!-- Weekly (Sunday) Report -->
+  <div class="mb-12">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-semibold text-black"></h3>
+      <div class="flex gap-4 text-sm">
+        <div class="flex items-center gap-1">
+          <div class="w-4 h-4 bg-purple-600 rounded-sm"></div> Présents
+        </div>
+        <div class="flex items-center gap-1">
+          <div class="w-4 h-4 bg-purple-300 rounded-sm"></div> Absents
+        </div>
+      </div>
+    </div>
+    <div id="sundayReport" class="space-y-4"></div>
+  </div>
+
+  <!-- Monthly Report -->
+  <div>
+    <h3 class="text-xl font-semibold text-black mb-4">Rapport mensuel</h3>
+    <canvas id="monthlyChart" height="150"></canvas>
+  </div>
+
+</div>
+
+<script>
+const monthDropdown = document.getElementById("month");
+const sundayReport = document.getElementById("sundayReport");
+const monthlyChartCtx = document.getElementById("monthlyChart").getContext("2d");
+
+let monthlyChart;
+
+// Render Weekly Bars
+function renderWeeklyBars(data) {
+  sundayReport.innerHTML = "";
+  const formatter = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+  data.forEach(item => {
+    const dateStr = formatter.format(new Date(item.date)); // format in French
+    const total = item.present + item.absent;
+    const presentPercent = total ? (item.present/total)*100 : 0;
+    const absentPercent = total ? (item.absent/total)*100 : 0;
+
+    sundayReport.innerHTML += `
+      <div>
+        <p class="mb-1 font-medium text-gray-700">${dateStr}</p>
+        <div class="w-full bg-gray-200 rounded-lg h-8 flex overflow-hidden">
+          <div class="bg-purple-600 h-8 flex items-center text-white text-sm font-bold px-2 transition-all duration-700" style="width:${presentPercent}%">
+            ${item.present}
+          </div>
+          <div class="bg-purple-300 h-8 flex items-center text-purple-900 text-sm font-bold px-2 transition-all duration-700" style="width:${absentPercent}%">
+            ${item.absent}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+
+// Render Monthly Chart with Newcomers
+function renderMonthlyChart(data) {
+  const monthlyPresent = data.present;
+  const monthlyAbsent = data.absent;
+  const monthlyNewcomers = data.newcomers || 0; // placeholder for new data
+  const monthlyTotal = monthlyPresent + monthlyAbsent + monthlyNewcomers;
+
+  if (monthlyChart) monthlyChart.destroy();
+  monthlyChart = new Chart(monthlyChartCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Présents', 'Absents', 'Nouveaux'],
+      datasets: [{
+        label: 'Pourcentage',
+        data: [
+          monthlyTotal ? (monthlyPresent/monthlyTotal*100).toFixed(1) : 0,
+          monthlyTotal ? (monthlyAbsent/monthlyTotal*100).toFixed(1) : 0,
+          monthlyTotal ? (monthlyNewcomers/monthlyTotal*100).toFixed(1) : 0
+        ],
+        backgroundColor: ['#7e22ce', '#c084fc', '#a78bfa'],
+        borderRadius: 12,
+        barPercentage: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          color: '#333',
+          font: { weight: 'bold', size: 12 },
+          anchor: 'end',
+          align: 'end',
+          formatter: (value) => value + '%'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            color: '#6b21a8',
+            font: { weight: 'bold' }
+          },
+          grid: { color: '#e9d5ff' }
+        },
+        x: {
+          ticks: {
+            color: '#6b21a8',
+            font: { weight: 'bold' }
+          },
+          grid: { color: '#e9d5ff' }
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+
+// Event: Load data on month change
+monthDropdown.addEventListener("change", async () => {
+  const month = monthDropdown.value;
+  if (!month) return;
+
+  try {
+    const res = await fetch(`/get-report?month=${month}`);
+    const data = await res.json();
+    if (!data.sunday_data || !data.monthly_data) return;
+
+    renderWeeklyBars(data.sunday_data);
+    renderMonthlyChart(data.monthly_data);
+
+  } catch (err) {
+    console.error("Error fetching report:", err);
+  }
+});
+</script>
+
+</body>
+</html>

@@ -15,7 +15,8 @@ import calendar
 from datetime import date, timedelta, datetime 
 warnings.simplefilter("ignore")
 from flask_migrate import Migrate
-from models import SundayPresence
+from models import SundayPresence, Presence 
+from collections import defaultdict 
 
 
 ROLE_MAPPING = {
@@ -431,11 +432,6 @@ def get_presence():
     return jsonify(result)
 
 
-
-@app.route("/reports")
-def reports():
-    return render_template("reports.html")
-
 @app.route("/monthly-data")
 def monthly_data_api():
     # Compute monthly presence/absence counts
@@ -453,6 +449,114 @@ def monthly_data_api():
     # Sort by date
     sorted_data = dict(sorted(data.items()))
     return jsonify(sorted_data)
+
+
+def get_sundays(year, month):
+    """Return list of date strings for all Sundays in a given month."""
+    sundays = []
+    date = datetime(year, month, 1)
+    while date.month == month:
+        if date.weekday() == 6:  # Sunday
+            sundays.append(date.strftime("%Y-%m-%d"))
+        date += timedelta(days=1)
+    return sundays
+
+
+# --- Core function: fetch presence for a given sunday ---
+def fetch_sunday_presence(sunday_date):
+    """Return {member_id: True/False} for a given Sunday."""
+    presences = SundayPresence.query.filter_by(sunday_date=sunday_date).all()
+    return {p.member_id: p.present for p in presences}
+
+# --- Route: fetch presence for a Sunday (used by your frontend) ---
+@app.route("/get-presence")
+def get_sunday_presence():
+    sunday = request.args.get("sunday")
+    if not sunday:
+        return jsonify({})
+    presence_dict = fetch_sunday_presence(sunday)
+    return jsonify(presence_dict)
+
+# --- Use fetch_sunday_presence in other routes ---
+@app.route("/get-report")
+def get_report():
+    month_str = request.args.get("month")
+    if not month_str:
+        return jsonify({"error": "Month required"}), 400
+
+    year, month = map(int, month_str.split("-"))
+    days_in_month = (datetime(year + (month // 12), month % 12 + 1, 1) - timedelta(days=1)).day
+
+    sundays = [datetime(year, month, d).date() for d in range(1, days_in_month + 1) if datetime(year, month, d).weekday() == 6]
+
+    sunday_data = []
+    monthly_total_present = 0
+    monthly_total_absent = 0
+
+    for sunday in sundays:
+        presences = fetch_sunday_presence(sunday)  # <-- use function
+        present_count = sum(1 for v in presences.values() if v)
+        absent_count = sum(1 for v in presences.values() if not v)
+        sunday_data.append({
+            "date": sunday.strftime("%Y-%m-%d"),
+            "present": present_count,
+            "absent": absent_count
+        })
+        monthly_total_present += present_count
+        monthly_total_absent += absent_count
+
+    monthly_data = {
+        "present": monthly_total_present,
+        "absent": monthly_total_absent
+    }
+
+    return jsonify({"sunday_data": sunday_data, "monthly_data": monthly_data})
+
+# --- Similarly fix get-monthly-report ---
+@app.route("/get-monthly-report")
+def get_monthly_report():
+    month = request.args.get("month")
+    if not month:
+        return jsonify({"error": "No month provided"})
+
+    year, m = map(int, month.split("-"))
+    first_day = date(year, m, 1)
+    last_day = date(year, m, calendar.monthrange(year, m)[1])
+
+    sundays = [first_day + timedelta(days=i) for i in range((last_day - first_day).days + 1) if (first_day + timedelta(days=i)).weekday() == 6]
+
+    result = []
+    for sunday in sundays:
+        presences = fetch_sunday_presence(sunday.strftime("%Y-%m-%d"))  # <-- fixed
+        total = len(presences)
+        present_count = sum(1 for v in presences.values() if v)
+        absent_count = total - present_count
+        percent_absent = round(absent_count / total * 100 if total else 0, 2)
+
+        result.append({
+            "date": sunday.strftime("%Y-%m-%d"),
+            "present": present_count,
+            "absent": absent_count,
+            "percent_absent": percent_absent
+        })
+
+    return jsonify(result)
+
+@app.route("/reports")
+def reports():
+    # Generate months for the dropdown
+    months = []
+    start_year = 2025
+    start_month = 9
+    for i in range(12):
+        year = start_year + (start_month + i - 1) // 12
+        month = (start_month + i - 1) % 12 + 1
+        month_name = datetime(year, month, 1).strftime("%B")
+        months.append((year, month, month_name))
+
+    current_year, current_month = date.today().year, date.today().month
+    return render_template("reports.html", months=months, current_year=current_year, current_month=current_month)
+
 
 
 # Run app
