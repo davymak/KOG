@@ -1,6 +1,7 @@
 # import_members.py
 import pandas as pd
 from app import app, db, Member
+import unicodedata
 
 # Mapping of expected fields to possible header names in Excel
 HEADER_MAPPING = {
@@ -23,11 +24,24 @@ for col in df.columns:
             continue
         cell_str = str(cell).strip()
         for field, possible_headers in HEADER_MAPPING.items():
-            if field not in header_indices and any(h.lower() == cell_str.lower() for h in possible_headers):
+            def normalize(text):
+                if not isinstance(text, str):
+                    return ""
+                text = text.strip().lower()
+                text = unicodedata.normalize("NFKD", text)
+                text = "".join(c for c in text if not unicodedata.combining(c))  # remove accents
+                text = text.replace("°", "o")  # normalize degree symbol
+                text = text.replace("nÂ", "n")  # fix encoding quirks
+                text = text.replace("  ", " ")  # normalize double spaces
+                return text
+
+            if field not in header_indices and any(normalize(h) == normalize(cell_str) for h in possible_headers):
                 header_indices[field] = (i, col)
 
 if len(header_indices) < len(HEADER_MAPPING):
     print("Warning: some headers were not found in the Excel file!")
+
+print("Detected headers:", header_indices)
 
 # Build a clean DataFrame
 members_data = []
@@ -37,7 +51,18 @@ for idx, row in df.iterrows():
     member_dict = {}
     empty_row = True
     for field, (h_row, h_col) in header_indices.items():
-        value = str(row[h_col]).strip() if h_col in row and not pd.isna(row[h_col]) else ""
+        raw_value = row.iloc[h_col] if h_col in row else None
+        if pd.isna(raw_value):
+            value = ""
+        else:
+            # Special handling for phone numbers
+            if field == "phone":
+                if isinstance(raw_value, (int, float)):
+                    value = str(int(raw_value))  # remove .0 if float
+                else:
+                    value = str(raw_value).strip()
+            else:
+                value = str(raw_value).strip() 
         if value:
             empty_row = False
         member_dict[field] = value

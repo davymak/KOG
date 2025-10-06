@@ -228,17 +228,35 @@ td .btn {
   vertical-align: middle;  /* align nicely */
 }
 
-/* Keep action buttons side by side inside the table */
-td .btn {
-  display: inline-block;   /* put buttons in one line */
-  margin-right: 6px;       /* spacing between them */
-  vertical-align: middle;  /* align nicely */
-}
-
-
     /* --- Animations --- */
     @keyframes fadeIn { from {opacity:0;} to{opacity:1;} }
     @keyframes slideIn { from {transform:translateY(-20px);} to {transform:translateY(0);} }
+
+    .phone-box {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-weight: 500;
+      font-family: "Inter", "Segoe UI", sans-serif;
+      letter-spacing: 0.3px;
+      text-align: center;
+      min-width: 80px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* Hover effect */
+    .phone-box:hover {
+      transform: scale(1.03);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Department colors */
+    .phone-dept-1 { background: #f0f7ff; border: 1.5px solid #450a6a; color: #450a6a; }
+    .phone-dept-2 { background: #f0f7ff; border: 1.5px solid #a0c4ff; color: #1a3d6e; }
+    .phone-dept-3 { background: #f9fff0; border: 1.5px solid #357409; color: #357409; }
+    .phone-dept-4 { background: #fff0f7; border: 1.5px solid #db2222; color: #db2222; }
+    .phone-dept-5 { background: #fff0f7; border: 1.5px solid #311a99; color: #311a99; }
+    /* Add more departments as needed */
   </style>
 </head>
 <body>
@@ -298,7 +316,14 @@ td .btn {
             <td><i class="fa-solid fa-user"></i></td>
             <td>{{ m.first_name }}</td>
             <td>{{ m.last_name }}</td>
-            <td>{{ m.phone }}</td>
+            <td>
+              <span class="phone-box 
+                {% if m.department == 'Administration' %}phone-dept-1{% endif %}
+                {% if m.department == 'Protocolat' %}phone-dept-2{% endif %}
+                {% if m.department == 'Organisation' %}phone-dept-3{% endif %}
+                {% if m.department == 'Intercession' %}phone-dept-4{% endif %}
+                {% if m.department == 'Groupe Adoration' %}phone-dept-5{% endif %}">
+                {{ m.phone }}</td>
             <td>{{ m.department }}</td>
             <td>{{ m.marital_status }}</td>
             <td>{{ m.place }}</td>
