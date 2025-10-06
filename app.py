@@ -319,13 +319,36 @@ def delete_active_member(id):
     db.session.commit()
     return jsonify({"message": "Deleted"})
 
-#sleeping_members
-@app.route("/sleeping_members")
-@login_required
-def sleeping_members():
-    members = Member.query.all()  # assuming you have 'active' column
-    return render_template("sleeping_members.html", members=[])    
 
+@app.route("/sleeping_members")
+def sleeping_members():
+    df = pd.read_excel("members.xlsx")
+
+    # Normalize column names (remove spaces, lowercase, etc.)
+    df.columns = df.columns.str.strip().str.lower()
+
+    # Create a mapping from messy Excel headers to your fixed headers
+    mapping = {
+        "nom": "Nom",
+        "NOM": "Nom",
+        "prenom": "Prenoms",
+        "PRENOMS": "Prenoms",
+        "N° TELEPHONE": "N° Telephone",
+        "telephone": "N° Telephone",
+        "situation matrimoniale": "Status",
+        "Status": "Status",
+        "departement": "Berger",
+        "Berger": "Berger"
+    }
+
+    # Rename only the columns that exist in the file
+    df = df.rename(columns={col: mapping[col] for col in df.columns if col in mapping})
+
+    # Keep only the columns you want
+    df = df[["Nom", "Prenoms", "N° Telephone", "Status", "Berger"]]
+
+    members = df.to_dict(orient="records")
+    return render_template("sleeping_members.html", members=members)
 
 @app.route("/monthly-presence")
 def monthly_presence():
@@ -558,6 +581,77 @@ def reports():
     return render_template("reports.html", months=months, current_year=current_year, current_month=current_month)
 
 
+
+# Route to render Absent List page
+# -----------------------------
+@app.route("/absent-list")
+def absent_list():
+    # Generate months available in your presence table
+    # For simplicity, let's take the last 6 months from today
+    today = date.today()
+    months = []
+    for i in range(6):
+        y = today.year
+        m = today.month - i
+        if m <= 0:
+            m += 12
+            y -= 1
+        month_name = calendar.month_name[m]
+        months.append((y, m, month_name))
+    months.reverse()  # Optional: show oldest first
+
+    return render_template("Absent_list.html", months=months, current_year=today.year, current_month=today.month)
+
+# -----------------------------
+# API to get absents for a selected sunday
+# -----------------------------
+@app.route("/get-absents")
+def get_absents():
+    sunday = request.args.get("sunday")
+    if not sunday:
+        return jsonify({"error": "No sunday provided"}), 400
+
+    try:
+        sunday_dt = datetime.strptime(sunday, "%Y-%m-%d").date()
+    except ValueError:
+        return jsonify({"error": "Invalid date format"}), 400
+
+    absences = (
+        SundayPresence.query
+        .filter_by(sunday_date=sunday_dt, present=False)
+        .join(Member, Member.id == SundayPresence.member_id)
+        .with_entities(Member.first_name, Member.last_name, Member.phone, Member.place)
+        .all()
+    )
+
+    # Convert to list of dicts for JSON
+    result = [
+        {"first_name": a[0], "last_name": a[1], "phone": a[2], "place": a[3]}
+        for a in absences
+    ]
+    return jsonify(result)
+
+# -----------------------------
+# API to get all Sundays in a selected month
+# -----------------------------
+@app.route("/get-sundays")
+def get_sundays():
+    month = request.args.get("month")  # Format: YYYY-MM
+    if not month:
+        return jsonify([])
+
+    try:
+        year, m = map(int, month.split("-"))
+    except ValueError:
+        return jsonify([])
+
+    days_in_month = calendar.monthrange(year, m)[1]
+    sundays = []
+    for d in range(1, days_in_month + 1):
+        dt = date(year, m, d)
+        if dt.weekday() == 6:  # Sunday
+            sundays.append(dt.strftime("%Y-%m-%d"))
+    return jsonify(sundays)
 
 # Run app
 if __name__ == '__main__':

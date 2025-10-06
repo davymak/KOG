@@ -181,10 +181,10 @@
         </a>
     </div>
 
-    <!-- Card 3: Sunday Checking List -->
+    <!-- Card 3: Liste des absents par dimanche -->
     <div class="card-box">
-        <a href="/sunday-presence" class="card-link">
-            <h2>Liste de présence du dimanche</h2>
+        <a href="{{ url_for('absent_list') }}" class="card-link">
+            <h2>Liste des absents par dimanche</h2>
             <i class="fa-solid fa-church card-icon"></i>
         </a>
     </div>
@@ -192,7 +192,7 @@
     <!-- Card 4: Presence Summary -->
     <div class="card-box">
         <a href="{{ url_for('reports') }}" class="card-link">
-            <h2>Résumé des présences et absences</h2>
+            <h2>Statistiques</h2>
             <i class="fa-solid fa-chart-pie card-icon"></i>
         </a>
     </div>
