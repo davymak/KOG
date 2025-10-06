@@ -600,7 +600,7 @@ def absent_list():
         months.append((y, m, month_name))
     months.reverse()  # Optional: show oldest first
 
-    return render_template("Absent_list.html", months=months, current_year=today.year, current_month=today.month)
+    return render_template("absent_list.html", months=months, current_year=today.year, current_month=today.month)
 
 # -----------------------------
 # API to get absents for a selected sunday
